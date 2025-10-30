@@ -1,0 +1,29 @@
+version: 1
+backend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - echo "Starting Node.js server build"
+  artifacts:
+    baseDirectory: .
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**
+
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "No frontend build"
+    build:
+      commands:
+        - echo "Skipping frontend"
+  artifacts:
+    baseDirectory: .
+    files:
+      - '**/*'

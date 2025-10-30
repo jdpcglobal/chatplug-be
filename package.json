@@ -10,8 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.839.0",
-    "@aws-sdk/lib-dynamodb": "^3.839.0",
+    "@aws-sdk/client-dynamodb": "^3.902.0",
+    "@aws-sdk/lib-dynamodb": "^3.902.0",
+    "aws-amplify": "^6.15.7",
     "aws-sdk": "^2.1692.0",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
@@ -23,7 +24,14 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "@aws-amplify/backend": "^1.17.0",
+    "@aws-amplify/backend-cli": "^1.8.0",
+    "aws-cdk-lib": "^2.216.0",
+    "constructs": "^10.4.2",
+    "esbuild": "^0.25.11",
+    "nodemon": "^3.1.10",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
   },
   "repository": {
     "type": "git",
