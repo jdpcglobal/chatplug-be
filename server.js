@@ -14,6 +14,7 @@ require("dotenv").config();
 // ---------------------------
 const childPromptRoutes = require("./routes/promptsRoutes");
 const websiteRoutes = require("./routes/websiteRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 
 // ---------------------------
 //  Initialize App
@@ -29,8 +30,6 @@ app.use(bodyParser.json());
 // ---------------------------
 //  Serve Static Files
 // ---------------------------
-// If you have a frontend build folder (like React or HTML files),
-// place them in the "public" directory.
 app.use(express.static(path.join(__dirname, "public")));
 
 // ---------------------------
@@ -45,6 +44,18 @@ app.get("/", (req, res) => {
 // ---------------------------
 app.use("/api/childprompt", childPromptRoutes);
 app.use("/api/websites", websiteRoutes);
+app.use("/api", chatRoutes);
+
+// ---------------------------
+//  Health Check Route
+// ---------------------------
+app.get("/health", (req, res) => {
+  res.json({ 
+    status: "OK", 
+    message: "Server is running",
+    timestamp: new Date().toISOString()
+  });
+});
 
 // ---------------------------
 //  Error Handling Middleware
@@ -55,11 +66,11 @@ app.use((err, req, res, next) => {
 });
 
 // ---------------------------
-//  Start the Server
+//  Start Server
 // ---------------------------
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
   console.log(`✅ API available at http://localhost:${PORT}`);
+  console.log(`✅ Health check: http://localhost:${PORT}/health`);
 });
