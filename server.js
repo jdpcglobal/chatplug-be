@@ -16,6 +16,7 @@ const childPromptRoutes = require("./routes/promptsRoutes");
 const websiteRoutes = require("./routes/websiteRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const codeConfigRoutes = require("./routes/codeConfigRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 // ---------------------------
 //  Initialize App
 // ---------------------------
@@ -49,6 +50,7 @@ app.get("/", (req, res) => {
 // ---------------------------
 //  API Routes
 // ---------------------------
+app.use('/api', aiRoutes);
 app.use("/api/childprompt", childPromptRoutes);
 app.use("/api/websites", websiteRoutes);
 app.use("/api", chatRoutes);
