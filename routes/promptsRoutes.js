@@ -30,5 +30,8 @@ router.post("/:websiteId/:promptName/add-prompt", controller.addPromptWithParams
 router.post("/:websiteId/:promptName/remove-prompt", controller.removePromptWithParams);
 router.get("/:websiteId/:promptName/get-prompt/:promptname", controller.getPromptWithParams);
 router.put("/:websiteId/:promptName/update-prompt", controller.updatePromptWithParams);
+// Get filtered prompt set
+router.get("/:websiteId/:promptName/filtered", controller.getFilteredPromptSet);
+
 
 module.exports = router;

@@ -3,68 +3,89 @@ const router = express.Router();
 const axios = require('axios');
 require('dotenv').config();
 
-// Store these in your .env file
 const GEMINI_API_URL = process.env.GEMINI_API_URL || 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY; // Store your Gemini API key here
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// AI Response Generation API
+/**
+ * POST: Generate AI Response
+ */
 router.post('/generate-ai-response', async (req, res) => {
   try {
-    const { question, websiteTitle, categories } = req.body;
-    
-    if (!question) {
+    const { question, websiteTitle, categories = [] } = req.body;
+
+    // Validation
+    if (!question || !question.trim()) {
       return res.status(400).json({
         success: false,
-        message: 'Question is required'
+        message: 'Please ask a question! 😊'
       });
     }
 
     if (!GEMINI_API_KEY) {
-      console.error('❌ GEMINI_API_KEY is not configured in environment variables');
       return res.status(500).json({
         success: false,
-        message: 'AI service is not configured'
+        message: 'AI service is updating... 🔄'
       });
     }
 
-    // Construct the prompt
-    const systemPrompt = `You are a support assistant for ${websiteTitle || 'Support'}. ${
-      categories && categories.length > 0 
-        ? `You must ONLY answer questions related to these categories: ${categories.join(', ')}. ` 
-        : ''
-    }Provide a short, helpful, and relevant answer. If the question is not related to your categories, politely explain that you can only help with category-related questions.\n\n${question}`;
+    // Create smart prompt
+    const systemPrompt = `
+You are a friendly assistant for "${websiteTitle || 'Support'}".
 
-    // Call Gemini API using stored URL and API key
+Categories I can help with: ${categories.length > 0 ? categories.join(', ') : 'anything'}
+
+Question: "${question}"
+
+Rules:
+1. Answer ONLY if question relates to: ${categories.join(', ')}
+2. Keep response SHORT and FRIENDLY (2-3 lines max)
+3. Use simple language with emojis 😊
+4. If unrelated, politely say: "I can help with ${categories.join(', ')}"
+
+Examples:
+• Medical question: "Rest well and drink water! 💧"
+• IT question: "Try restarting your computer! 🔄"
+• General: "I'd love to help! Tell me more. 🤗"
+
+Now respond:
+`;
+
+    // API Call
     const geminiResponse = await axios.post(
       `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`,
       {
-        contents: [{
-          parts: [{
-            text: systemPrompt
-          }]
-        }]
+        contents: [
+          {
+            parts: [{ text: systemPrompt }]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.8,
+          maxOutputTokens: 150,
+          topP: 0.9,
+        }
       },
       {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 8000
       }
     );
 
     const responseText = geminiResponse.data?.candidates?.[0]?.content?.parts?.[0]?.text || 
-                        "Sorry, I couldn't generate a response.";
+      "I'm here to help! 😊";
 
+    // Response
     res.json({
       success: true,
-      response: responseText
+      response: responseText.trim()
     });
 
   } catch (error) {
-    console.error('Error generating AI response:', error.message);
+    console.error('Error:', error.message);
     
     res.status(500).json({
       success: false,
-      message: 'Error processing AI request'
+      message: 'Please try again! 🔄'
     });
   }
 });

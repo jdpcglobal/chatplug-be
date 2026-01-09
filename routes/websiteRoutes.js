@@ -3,31 +3,25 @@ const express = require('express');
 const router = express.Router();
 const websiteController = require('../controllers/websiteController');
 
-// CREATE
+router.get('/client-config', websiteController.getClientWebsiteConfig);
+// 🔑 API-key based (ALWAYS FIRST)
+router.get('/header', websiteController.getWebsitesHeader);
+router.get('/chat-config', websiteController.getChatConfig);
+
+// CRUD
 router.post('/', websiteController.createWebsite);
-
-// READ ALL
 router.get('/', websiteController.getWebsites);
-
-// READ ONE BY ID
 router.get('/:id', websiteController.getWebsiteById);
 
-// READ ONE BY API KEY
-router.get('/by-api-key/key', websiteController.getWebsiteByApiKey);
-
-// UPDATE FULL WEBSITE BY ID
+// Updates
 router.put('/:id', websiteController.updateWebsite);
-
-// UPDATE CUSTOM DATA ONLY BY ID
 router.patch('/:id/custom-data', websiteController.updateWebsiteCustomData);
-
-// UPDATE STATUS ONLY BY ID
 router.patch('/:id/status', websiteController.updateWebsiteStatus);
 
-// DELETE BY ID
+// Delete
 router.delete('/:id', websiteController.deleteWebsite);
 
-// SYNC
+// Sync
 router.post('/sync', websiteController.syncWebsites);
 
 module.exports = router;

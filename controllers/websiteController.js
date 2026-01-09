@@ -130,3 +130,121 @@ exports.syncWebsites = async (req, res) => {
     });
   }
 };
+exports.getWebsitesHeader = async (req, res) => {
+  const apiKey = req.query.apiKey || req.headers['x-api-key'];
+
+  if (!apiKey) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing apiKey'
+    });
+  }
+
+  const result = await websiteModel.getWebsiteByApiKey(apiKey);
+
+  if (!result.success) {
+    return res.status(404).json(result);
+  }
+
+  return res.status(200).json({
+    success: true,
+    item: {
+      websiteName: result.item.websiteName,
+      status: result.item.status
+    }
+  });
+};
+exports.getChatConfig = async (req, res) => {
+  const apiKey = req.query.apiKey || req.headers['x-api-key'];
+
+  if (!apiKey) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing apiKey'
+    });
+  }
+
+  const result = await websiteModel.getWebsiteByApiKey(apiKey);
+
+  if (!result.success) {
+    return res.status(404).json(result);
+  }
+
+  return res.status(200).json({
+    success: true,
+    item: {
+      systemPrompt: result.item.systemPrompt,
+      customPrompt: result.item.customPrompt,
+      category: result.item.category,
+      urls: result.item.urls,
+      library: result.item.library
+    }
+  });
+};
+exports.getWelcomeMessages = async (req, res) => {
+  const { websiteId } = req.query;
+
+  if (!websiteId) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing websiteId'
+    });
+  }
+
+  const result = await welcomeMessageModel.getByWebsiteId(websiteId);
+
+  if (!result.success) {
+    return res.status(404).json(result);
+  }
+
+  return res.json({
+    success: true,
+    items: result.items.map(item => ({
+      message: item.message
+    }))
+  });
+};
+// controllers/website.controller.js
+
+exports.getClientWebsiteConfig = async (req, res) => {
+  const apiKey = req.query.apiKey || req.headers['x-api-key'];
+
+  if (!apiKey) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing apiKey'
+    });
+  }
+
+  try {
+    const result = await websiteModel.getWebsiteByApiKey(apiKey);
+
+    if (!result.success || !result.item) {
+      return res.status(404).json({
+        success: false,
+        error: 'Website not found'
+      });
+    }
+
+    const website = result.item;
+
+    // ✅ ONLY REQUIRED FIELDS
+    return res.status(200).json({
+      success: true,
+      item: {
+        id: website.id,
+        websiteName: website.websiteName,
+        status: website.status,
+        systemPrompt: website.systemPrompt || [],
+        customPrompt: website.customPrompt || [],
+        category: website.category || []
+      }
+    });
+  } catch (error) {
+    console.error('Client config error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Server error'
+    });
+  }
+};

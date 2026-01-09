@@ -1,5 +1,6 @@
 const model = require("../models/promptsModel");
 
+const fetch = require('node-fetch');
 // ✅ Health check
 exports.healthCheck = (req, res) => {
   res.status(200).json({ message: "ChildPrompt API is running ✅" });
@@ -262,7 +263,7 @@ exports.getByBackendApiKey = async (req, res) => {
   try {
     const { backendApiKey } = req.params;
     const result = await model.getByBackendApiKey(backendApiKey);
-    
+  
     if (!result.length) {
       return res.status(404).json({ 
         error: "No data found for this backend API key" 
@@ -274,3 +275,33 @@ exports.getByBackendApiKey = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+
+// ✅ Get filtered prompt set
+exports.getFilteredPromptSet = async (req, res) => {
+  try {
+    const { websiteId, promptName } = req.params;
+    const result = await model.getPromptSet(websiteId, promptName);
+
+    if (!result) {
+      return res.status(404).json({ error: "Prompt set not found" });
+    }
+
+    // Only return filtered fields
+    const filteredData = {
+      backendApiKey: result.backendApiKey,
+      promptList: result.promptList,
+      promptName: result.promptName,
+      prompts: result.prompts,
+      promptsWithParams: result.promptsWithParams,
+      websiteId: result.websiteId
+    };
+
+    res.json(filteredData);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
